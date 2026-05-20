@@ -12,12 +12,14 @@
       background: #f7f7f5;
       color: #1a1a1a;
       min-height: 100vh;
-      padding: 20px 16px 40px;
+      padding: 20px 16px 48px;
     }
-    .wrap { max-width: 420px; margin: 0 auto; }
-    .page-header { text-align: center; margin-bottom: 20px; }
+    .wrap { max-width: 440px; margin: 0 auto; }
+    .page-header { text-align: center; margin-bottom: 16px; }
     .page-title { font-size: 17px; font-weight: 500; margin-bottom: 3px; }
     .page-sub { font-size: 12px; color: #6b6965; }
+
+    /* ゲート */
     .gate-row { display: flex; gap: 8px; margin-bottom: 14px; }
     .gate-btn {
       flex: 1; padding: 9px 4px; font-size: 13px; font-weight: 500;
@@ -26,11 +28,15 @@
       transition: all 0.15s; font-family: inherit;
     }
     .gate-btn.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+
+    /* QRリーダー */
     #reader {
       width: 100%; border-radius: 12px; overflow: hidden;
       border: 1px solid #e0ddd8; background: #fff;
       margin-bottom: 14px;
     }
+
+    /* 結果ボックス */
     .result-box {
       border-radius: 10px; padding: 18px 16px; text-align: center;
       margin-bottom: 14px; border: 1px solid #e0ddd8; background: #fff;
@@ -47,6 +53,8 @@
     .result-main.danger  { color: #A32D2D; }
     .result-sub { font-size: 13px; color: #5a5855; }
     .result-idle { font-size: 13px; color: #9e9b96; }
+
+    /* カウント */
     .count-row { display: flex; gap: 8px; margin-bottom: 14px; }
     .count-card {
       flex: 1; background: #fff; border: 1px solid #e0ddd8;
@@ -54,21 +62,83 @@
     }
     .count-label { font-size: 11px; color: #9e9b96; margin-bottom: 4px; }
     .count-val { font-size: 22px; font-weight: 500; color: #1a1a1a; }
-    .manual-row { display: flex; gap: 8px; }
-    .manual-input {
-      flex: 1; padding: 10px 12px; font-size: 13px;
-      border: 1px solid #d8d6d0; border-radius: 8px;
-      background: #fff; color: #1a1a1a; outline: none; font-family: inherit;
+    .count-sub { font-size: 10px; color: #b0ada8; margin-top: 2px; }
+
+    /* エリア別内訳 */
+    .breakdown {
+      background: #fff; border: 1px solid #e0ddd8; border-radius: 8px;
+      padding: 10px 14px; margin-bottom: 14px;
     }
-    .manual-input:focus { border-color: #888; }
+    .breakdown-title { font-size: 11px; color: #9e9b96; margin-bottom: 8px; }
+    .breakdown-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+    .breakdown-area { font-size: 12px; color: #5a5855; }
+    .breakdown-count { font-size: 12px; font-weight: 500; color: #1a1a1a; }
+    .breakdown-bar-bg { flex: 1; height: 3px; background: #ede9e3; border-radius: 2px; margin: 0 10px; }
+    .breakdown-bar { height: 3px; border-radius: 2px; background: #1D9E75; transition: width 0.4s; }
+
+    /* 手動照合 */
+    .manual-section { margin-bottom: 0; }
+    .manual-tabs { display: flex; gap: 0; margin-bottom: 0; border-radius: 8px 8px 0 0; overflow: hidden; border: 1px solid #d8d6d0; border-bottom: none; }
+    .manual-tab {
+      flex: 1; padding: 8px 4px; font-size: 12px; font-weight: 500;
+      border: none; background: #f0ede8; color: #6b6965;
+      cursor: pointer; font-family: inherit; transition: all 0.15s; text-align: center;
+    }
+    .manual-tab.active { background: #fff; color: #1a1a1a; }
+    .manual-body {
+      border: 1px solid #d8d6d0; border-radius: 0 0 8px 8px;
+      padding: 10px; background: #fff; display: flex; gap: 8px;
+    }
+    .manual-input {
+      flex: 1; padding: 9px 12px; font-size: 13px;
+      border: 1px solid #d8d6d0; border-radius: 6px;
+      background: #f7f7f5; color: #1a1a1a; outline: none; font-family: inherit;
+    }
+    .manual-input:focus { border-color: #888; background: #fff; }
     .manual-btn {
-      padding: 10px 16px; font-size: 13px; font-weight: 500;
-      border-radius: 8px; border: 1px solid #d8d6d0;
-      background: #fff; color: #1a1a1a; cursor: pointer;
+      padding: 9px 16px; font-size: 13px; font-weight: 500;
+      border-radius: 6px; border: 1px solid #d8d6d0;
+      background: #1a1a1a; color: #fff; cursor: pointer;
       font-family: inherit; white-space: nowrap;
     }
-    .manual-btn:hover { background: #f0ede8; }
-    .manual-label { font-size: 11px; color: #9e9b96; margin-bottom: 6px; margin-top: 14px; }
+    .manual-btn:hover { opacity: 0.85; }
+
+    /* 入場ログ */
+    .log-section { margin-top: 16px; }
+    .log-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 8px;
+    }
+    .log-title { font-size: 12px; font-weight: 500; color: #6b6965; }
+    .log-clear {
+      font-size: 11px; color: #b0ada8; background: none; border: none;
+      cursor: pointer; padding: 0; font-family: inherit;
+    }
+    .log-clear:hover { color: #a32d2d; }
+    .log-list {
+      background: #fff; border: 1px solid #e0ddd8; border-radius: 8px;
+      overflow: hidden; max-height: 260px; overflow-y: auto;
+    }
+    .log-empty { padding: 16px; text-align: center; font-size: 12px; color: #b0ada8; }
+    .log-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 12px; border-bottom: 1px solid #f0ede8; font-size: 12px;
+    }
+    .log-item:last-child { border-bottom: none; }
+    .log-item.success { border-left: 3px solid #a8dbbf; }
+    .log-item.warning { border-left: 3px solid #f5d87a; }
+    .log-item.danger  { border-left: 3px solid #f5c0c0; }
+    .log-time { color: #9e9b96; white-space: nowrap; font-size: 11px; min-width: 42px; }
+    .log-name { font-weight: 500; color: #1a1a1a; flex: 1; }
+    .log-area { color: #6b6965; white-space: nowrap; }
+    .log-badge {
+      font-size: 10px; padding: 2px 6px; border-radius: 4px; white-space: nowrap;
+    }
+    .log-badge.success { background: #e6f4ee; color: #0F6E56; }
+    .log-badge.warning { background: #fff8e6; color: #854F0B; }
+    .log-badge.danger  { background: #fff2f2; color: #A32D2D; }
+
+    .refresh-note { font-size: 10px; color: #b0ada8; text-align: right; margin-top: 4px; }
   </style>
 </head>
 <body>
@@ -98,37 +168,104 @@
     <div class="count-card">
       <p class="count-label">全体入場済</p>
       <p class="count-val" id="cnt-total">—</p>
+      <p class="count-sub" id="cnt-updated"></p>
     </div>
   </div>
 
-  <p class="manual-label">氏名で手動照合</p>
-  <div class="manual-row">
-    <input class="manual-input" type="text" id="manual-input" placeholder="氏名を入力">
-    <button class="manual-btn" onclick="manualCheck()">照合</button>
+  <!-- エリア別内訳 -->
+  <div class="breakdown">
+    <p class="breakdown-title">エリア別入場数</p>
+    <div id="breakdown-rows">
+      <div style="font-size:12px;color:#b0ada8;padding:4px 0">読み込み中...</div>
+    </div>
+  </div>
+  <p class="refresh-note" id="refresh-note">30秒ごとに自動更新</p>
+
+  <!-- 手動照合 -->
+  <div class="manual-section">
+    <div class="manual-tabs">
+      <button class="manual-tab active" onclick="switchTab('name', this)">氏名で照合</button>
+      <button class="manual-tab" onclick="switchTab('id', this)">予約IDで照合</button>
+    </div>
+    <div class="manual-body">
+      <input class="manual-input" type="text" id="manual-input-name" placeholder="例：千葉 英和">
+      <input class="manual-input" type="text" id="manual-input-id" placeholder="例：RSK-A3F9X2" style="display:none;text-transform:uppercase">
+      <button class="manual-btn" onclick="manualCheck()">照合</button>
+    </div>
+  </div>
+
+  <!-- 入場ログ -->
+  <div class="log-section">
+    <div class="log-header">
+      <span class="log-title">入場ログ（このセッション）</span>
+      <button class="log-clear" onclick="clearLog()">クリア</button>
+    </div>
+    <div class="log-list" id="log-list">
+      <div class="log-empty" id="log-empty">まだ入場記録がありません</div>
+    </div>
   </div>
 </div>
 
 <audio id="entrySound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg" preload="auto"></audio>
 
 <script>
-  // ★ GAS デプロイURL（doPostを叩く）
   const GAS_URL = 'https://script.google.com/macros/s/AKfycbzOcC-I67V_yYLmjGFr9A-QzJsgobXthgeqNhnPz8xUqCfBVeJly3ObM-3o58RgcXOL/exec';
+
+  const AREA_CAPS = { A: 120, B: 120, C: 150, D: 150 };
+  const TOTAL_CAP = Object.values(AREA_CAPS).reduce((a, b) => a + b, 0);
 
   let gateLabel = 'ゲート1';
   let gateCount = 0;
   let lastScannedCode = '';
   let scannerIsBusy = false;
+  let currentTab = 'name';
+  let logItems = [];
 
-  // GAS APIを呼ぶ共通関数
-  async function callGAS(action, params) {
+  // ─── GAS API呼び出し ───────────────────────────────────────
+  async function callGAS(action, params = {}) {
     const res = await fetch(GAS_URL, {
       method: 'POST',
       body: JSON.stringify({ action, ...params }),
-      headers: { 'Content-Type': 'text/plain' } // GASはContent-Type: application/jsonをCORSでブロックするため
+      headers: { 'Content-Type': 'text/plain' }
     });
     return res.json();
   }
 
+  // ─── 全体入場数ポーリング（30秒ごと）──────────────────────
+  async function fetchTotalCount() {
+    try {
+      const res = await callGAS('getTotalEntryCount');
+      document.getElementById('cnt-total').textContent = res.total;
+      const now = new Date();
+      document.getElementById('cnt-updated').textContent =
+        now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0') + ' 更新';
+      renderBreakdown(res.byArea);
+    } catch(e) {
+      // 失敗しても無視
+    }
+  }
+
+  function renderBreakdown(byArea) {
+    const container = document.getElementById('breakdown-rows');
+    container.innerHTML = '';
+    Object.keys(AREA_CAPS).forEach(area => {
+      const count = byArea[area] || 0;
+      const cap = AREA_CAPS[area];
+      const pct = Math.min(Math.round(count / cap * 100), 100);
+      const row = document.createElement('div');
+      row.className = 'breakdown-row';
+      row.innerHTML =
+        '<span class="breakdown-area">' + area + ' エリア</span>' +
+        '<div class="breakdown-bar-bg"><div class="breakdown-bar" style="width:' + pct + '%"></div></div>' +
+        '<span class="breakdown-count">' + count + '<span style="color:#b0ada8;font-weight:400"> / ' + cap + '</span></span>';
+      container.appendChild(row);
+    });
+  }
+
+  fetchTotalCount();
+  setInterval(fetchTotalCount, 30000);
+
+  // ─── ゲート切り替え ────────────────────────────────────────
   function setGate(el, label) {
     document.querySelectorAll('.gate-btn').forEach(b => b.classList.remove('active'));
     el.classList.add('active');
@@ -138,24 +275,24 @@
     showIdle();
   }
 
+  // ─── QRスキャナー ──────────────────────────────────────────
   const html5QrcodeScanner = new Html5QrcodeScanner('reader', {
     fps: 10,
     qrbox: { width: 250, height: 250 }
   });
-  html5QrcodeScanner.render(handleScan, onScanError);
+  html5QrcodeScanner.render(handleScan, () => {});
 
   async function handleScan(qrText) {
     if (scannerIsBusy || qrText === lastScannedCode) return;
-
     scannerIsBusy = true;
     lastScannedCode = qrText;
     showChecking();
 
-    await html5QrcodeScanner.clear();
+    await html5QrcodeScanner.clear().catch(() => {});
 
     try {
       const res = await callGAS('checkEntryStatus', { reservationId: qrText });
-      showResult(res);
+      showResult(res, 'QR');
     } catch(e) {
       showDanger('通信エラー', 'もう一度お試しください');
     }
@@ -163,38 +300,74 @@
     setTimeout(resetScanner, 3000);
   }
 
-  function onScanError() {}
-
   function resetScanner() {
     lastScannedCode = '';
     scannerIsBusy = false;
     showIdle();
-    html5QrcodeScanner.render(handleScan, onScanError);
+    html5QrcodeScanner.render(handleScan, () => {});
+  }
+
+  // ─── 手動照合タブ ──────────────────────────────────────────
+  function switchTab(tab, el) {
+    currentTab = tab;
+    document.querySelectorAll('.manual-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('manual-input-name').style.display = tab === 'name' ? '' : 'none';
+    document.getElementById('manual-input-id').style.display = tab === 'id' ? '' : 'none';
   }
 
   async function manualCheck() {
-    const name = document.getElementById('manual-input').value.trim();
-    if (!name) return;
+    let value, action, params;
+
+    if (currentTab === 'name') {
+      value = document.getElementById('manual-input-name').value.trim();
+      if (!value) return;
+      action = 'checkEntryByName';
+      params = { name: value };
+    } else {
+      value = document.getElementById('manual-input-id').value.trim().toUpperCase();
+      if (!value) return;
+      action = 'checkEntryStatus';
+      params = { reservationId: value };
+    }
+
     showChecking();
     try {
-      const res = await callGAS('checkEntryByName', { name });
-      showResult(res);
+      const res = await callGAS(action, params);
+      showResult(res, '手動');
       setTimeout(showIdle, 3000);
+      // 手動照合後は入力欄をクリア
+      document.getElementById('manual-input-name').value = '';
+      document.getElementById('manual-input-id').value = '';
     } catch(e) {
       showDanger('通信エラー', 'もう一度お試しください');
     }
   }
 
-  function showResult(res) {
+  // Enterキーで照合
+  ['manual-input-name', 'manual-input-id'].forEach(id => {
+    document.getElementById(id).addEventListener('keydown', e => {
+      if (e.key === 'Enter') manualCheck();
+    });
+  });
+
+  // ─── 結果表示 ──────────────────────────────────────────────
+  function showResult(res, method) {
+    const time = new Date();
     if (res.status === 'entry_success') {
       gateCount++;
       document.getElementById('cnt-gate').textContent = gateCount;
-      document.getElementById('entrySound').play().catch(()=>{});
+      document.getElementById('entrySound').play().catch(() => {});
       showSuccess('入場を許可しました', res.name + '　— ' + res.area + ' エリア');
+      addLog('success', time, res.name, res.area, '入場', method);
+      // 入場成功時はすぐに全体数を更新
+      setTimeout(fetchTotalCount, 1000);
     } else if (res.status === 'already_entered') {
       showWarning('入場済みです', res.name + '　— ' + res.area + ' エリア');
+      addLog('warning', time, res.name, res.area, '入場済', method);
     } else if (res.status === 'not_found') {
-      showDanger('データ未登録', 'QRコードまたは氏名を確認してください');
+      showDanger('データ未登録', 'QRコードまたは入力内容を確認してください');
+      addLog('danger', time, '—', '—', '未登録', method);
     } else if (res.status === 'invalid_format') {
       showDanger('QR読み取りエラー', '対応していないQRコードです');
     } else if (res.status === 'lock_error') {
@@ -204,6 +377,43 @@
     }
   }
 
+  // ─── 入場ログ ──────────────────────────────────────────────
+  function addLog(type, time, name, area, label, method) {
+    const timeStr = String(time.getHours()).padStart(2, '0') + ':' + String(time.getMinutes()).padStart(2, '0');
+    logItems.unshift({ type, timeStr, name, area, label, method });
+    renderLog();
+  }
+
+  function renderLog() {
+    const list = document.getElementById('log-list');
+    const empty = document.getElementById('log-empty');
+    if (logItems.length === 0) {
+      empty.style.display = '';
+      // ヘッダー以外削除
+      while (list.children.length > 1) list.removeChild(list.lastChild);
+      return;
+    }
+    empty.style.display = 'none';
+    // 既存ログ行削除
+    while (list.children.length > 1) list.removeChild(list.lastChild);
+    logItems.forEach(item => {
+      const el = document.createElement('div');
+      el.className = 'log-item ' + item.type;
+      el.innerHTML =
+        '<span class="log-time">' + item.timeStr + '</span>' +
+        '<span class="log-name">' + item.name + '</span>' +
+        '<span class="log-area">' + (item.area !== '—' ? item.area + 'エリア' : '—') + '</span>' +
+        '<span class="log-badge ' + item.type + '">' + item.label + '</span>';
+      list.appendChild(el);
+    });
+  }
+
+  function clearLog() {
+    logItems = [];
+    renderLog();
+  }
+
+  // ─── UI ヘルパー ───────────────────────────────────────────
   function showIdle() {
     const b = document.getElementById('result-box');
     b.className = 'result-box';
