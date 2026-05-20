@@ -1,0 +1,22 @@
+{
+  "name": "梨花祭2026 入場予約",
+  "short_name": "梨花祭2026",
+  "description": "梨花祭2026 中夜祭・後夜祭 入場予約",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f7f7f5",
+  "theme_color": "#1a1a1a",
+  "lang": "ja",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

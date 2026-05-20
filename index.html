@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>梨花祭2026 入場確認</title>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", sans-serif;
+      background: #f7f7f5;
+      color: #1a1a1a;
+      min-height: 100vh;
+      padding: 20px 16px 40px;
+    }
+    .wrap { max-width: 420px; margin: 0 auto; }
+    .page-header { text-align: center; margin-bottom: 20px; }
+    .page-title { font-size: 17px; font-weight: 500; margin-bottom: 3px; }
+    .page-sub { font-size: 12px; color: #6b6965; }
+    .gate-row { display: flex; gap: 8px; margin-bottom: 14px; }
+    .gate-btn {
+      flex: 1; padding: 9px 4px; font-size: 13px; font-weight: 500;
+      border-radius: 8px; border: 1px solid #d8d6d0;
+      background: #fff; color: #6b6965; cursor: pointer;
+      transition: all 0.15s; font-family: inherit;
+    }
+    .gate-btn.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+    #reader {
+      width: 100%; border-radius: 12px; overflow: hidden;
+      border: 1px solid #e0ddd8; background: #fff;
+      margin-bottom: 14px;
+    }
+    .result-box {
+      border-radius: 10px; padding: 18px 16px; text-align: center;
+      margin-bottom: 14px; border: 1px solid #e0ddd8; background: #fff;
+      min-height: 80px; display: flex;
+      flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .result-box.success { background: #e6f4ee; border-color: #a8dbbf; }
+    .result-box.warning { background: #fff8e6; border-color: #f5d87a; }
+    .result-box.danger  { background: #fff2f2; border-color: #f5c0c0; }
+    .result-main { font-size: 18px; font-weight: 500; }
+    .result-main.success { color: #0F6E56; }
+    .result-main.warning { color: #854F0B; }
+    .result-main.danger  { color: #A32D2D; }
+    .result-sub { font-size: 13px; color: #5a5855; }
+    .result-idle { font-size: 13px; color: #9e9b96; }
+    .count-row { display: flex; gap: 8px; margin-bottom: 14px; }
+    .count-card {
+      flex: 1; background: #fff; border: 1px solid #e0ddd8;
+      border-radius: 8px; padding: 10px 12px; text-align: center;
+    }
+    .count-label { font-size: 11px; color: #9e9b96; margin-bottom: 4px; }
+    .count-val { font-size: 22px; font-weight: 500; color: #1a1a1a; }
+    .manual-row { display: flex; gap: 8px; }
+    .manual-input {
+      flex: 1; padding: 10px 12px; font-size: 13px;
+      border: 1px solid #d8d6d0; border-radius: 8px;
+      background: #fff; color: #1a1a1a; outline: none; font-family: inherit;
+    }
+    .manual-input:focus { border-color: #888; }
+    .manual-btn {
+      padding: 10px 16px; font-size: 13px; font-weight: 500;
+      border-radius: 8px; border: 1px solid #d8d6d0;
+      background: #fff; color: #1a1a1a; cursor: pointer;
+      font-family: inherit; white-space: nowrap;
+    }
+    .manual-btn:hover { background: #f0ede8; }
+    .manual-label { font-size: 11px; color: #9e9b96; margin-bottom: 6px; margin-top: 14px; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="page-header">
+    <p class="page-title">梨花祭2026　入場確認</p>
+    <p class="page-sub">中夜祭・後夜祭</p>
+  </div>
+
+  <div class="gate-row">
+    <button class="gate-btn active" onclick="setGate(this, 'ゲート1')">ゲート 1</button>
+    <button class="gate-btn" onclick="setGate(this, 'ゲート2')">ゲート 2</button>
+    <button class="gate-btn" onclick="setGate(this, 'ゲート3')">ゲート 3</button>
+  </div>
+
+  <div id="reader"></div>
+
+  <div class="result-box" id="result-box">
+    <span class="result-idle">QRコードをかざしてください</span>
+  </div>
+
+  <div class="count-row">
+    <div class="count-card">
+      <p class="count-label">入場済（このゲート）</p>
+      <p class="count-val" id="cnt-gate">0</p>
+    </div>
+    <div class="count-card">
+      <p class="count-label">全体入場済</p>
+      <p class="count-val" id="cnt-total">—</p>
+    </div>
+  </div>
+
+  <p class="manual-label">氏名で手動照合</p>
+  <div class="manual-row">
+    <input class="manual-input" type="text" id="manual-input" placeholder="氏名を入力">
+    <button class="manual-btn" onclick="manualCheck()">照合</button>
+  </div>
+</div>
+
+<audio id="entrySound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg" preload="auto"></audio>
+
+<script>
+  // ★ GAS デプロイURL（doPostを叩く）
+  const GAS_URL = 'https://script.google.com/macros/s/AKfycbzOcC-I67V_yYLmjGFr9A-QzJsgobXthgeqNhnPz8xUqCfBVeJly3ObM-3o58RgcXOL/exec';
+
+  let gateLabel = 'ゲート1';
+  let gateCount = 0;
+  let lastScannedCode = '';
+  let scannerIsBusy = false;
+
+  // GAS APIを呼ぶ共通関数
+  async function callGAS(action, params) {
+    const res = await fetch(GAS_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action, ...params }),
+      headers: { 'Content-Type': 'text/plain' } // GASはContent-Type: application/jsonをCORSでブロックするため
+    });
+    return res.json();
+  }
+
+  function setGate(el, label) {
+    document.querySelectorAll('.gate-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    gateLabel = label;
+    gateCount = 0;
+    document.getElementById('cnt-gate').textContent = 0;
+    showIdle();
+  }
+
+  const html5QrcodeScanner = new Html5QrcodeScanner('reader', {
+    fps: 10,
+    qrbox: { width: 250, height: 250 }
+  });
+  html5QrcodeScanner.render(handleScan, onScanError);
+
+  async function handleScan(qrText) {
+    if (scannerIsBusy || qrText === lastScannedCode) return;
+
+    scannerIsBusy = true;
+    lastScannedCode = qrText;
+    showChecking();
+
+    await html5QrcodeScanner.clear();
+
+    try {
+      const res = await callGAS('checkEntryStatus', { reservationId: qrText });
+      showResult(res);
+    } catch(e) {
+      showDanger('通信エラー', 'もう一度お試しください');
+    }
+
+    setTimeout(resetScanner, 3000);
+  }
+
+  function onScanError() {}
+
+  function resetScanner() {
+    lastScannedCode = '';
+    scannerIsBusy = false;
+    showIdle();
+    html5QrcodeScanner.render(handleScan, onScanError);
+  }
+
+  async function manualCheck() {
+    const name = document.getElementById('manual-input').value.trim();
+    if (!name) return;
+    showChecking();
+    try {
+      const res = await callGAS('checkEntryByName', { name });
+      showResult(res);
+      setTimeout(showIdle, 3000);
+    } catch(e) {
+      showDanger('通信エラー', 'もう一度お試しください');
+    }
+  }
+
+  function showResult(res) {
+    if (res.status === 'entry_success') {
+      gateCount++;
+      document.getElementById('cnt-gate').textContent = gateCount;
+      document.getElementById('entrySound').play().catch(()=>{});
+      showSuccess('入場を許可しました', res.name + '　— ' + res.area + ' エリア');
+    } else if (res.status === 'already_entered') {
+      showWarning('入場済みです', res.name + '　— ' + res.area + ' エリア');
+    } else if (res.status === 'not_found') {
+      showDanger('データ未登録', 'QRコードまたは氏名を確認してください');
+    } else if (res.status === 'invalid_format') {
+      showDanger('QR読み取りエラー', '対応していないQRコードです');
+    } else if (res.status === 'lock_error') {
+      showDanger('サーバー混雑', 'もう一度スキャンしてください');
+    } else {
+      showDanger('エラー', res.status);
+    }
+  }
+
+  function showIdle() {
+    const b = document.getElementById('result-box');
+    b.className = 'result-box';
+    b.innerHTML = '<span class="result-idle">QRコードをかざしてください</span>';
+  }
+  function showChecking() {
+    const b = document.getElementById('result-box');
+    b.className = 'result-box';
+    b.innerHTML = '<span class="result-idle">確認中...</span>';
+  }
+  function showSuccess(main, sub) { setResultBox('success', '✓', main, sub); }
+  function showWarning(main, sub) { setResultBox('warning', '!', main, sub); }
+  function showDanger(main, sub)  { setResultBox('danger',  '×', main, sub); }
+  function setResultBox(type, icon, main, sub) {
+    const b = document.getElementById('result-box');
+    b.className = 'result-box ' + type;
+    b.innerHTML =
+      '<div style="font-size:28px;line-height:1">' + icon + '</div>' +
+      '<div class="result-main ' + type + '">' + main + '</div>' +
+      '<div class="result-sub">' + sub + '</div>';
+  }
+</script>
+</body>
+</html>
