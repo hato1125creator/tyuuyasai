@@ -3,438 +3,256 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>梨花祭2026 入場確認</title>
-  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <title>梨花祭2026 中夜祭 入場確認</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", sans-serif;
-      background: #f7f7f5;
-      color: #1a1a1a;
-      min-height: 100vh;
-      padding: 20px 16px 48px;
-    }
-    .wrap { max-width: 440px; margin: 0 auto; }
-    .page-header { text-align: center; margin-bottom: 16px; }
-    .page-title { font-size: 17px; font-weight: 500; margin-bottom: 3px; }
-    .page-sub { font-size: 12px; color: #6b6965; }
-
-    /* ゲート */
-    .gate-row { display: flex; gap: 8px; margin-bottom: 14px; }
-    .gate-btn {
-      flex: 1; padding: 9px 4px; font-size: 13px; font-weight: 500;
-      border-radius: 8px; border: 1px solid #d8d6d0;
-      background: #fff; color: #6b6965; cursor: pointer;
-      transition: all 0.15s; font-family: inherit;
-    }
-    .gate-btn.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
-
-    /* QRリーダー */
-    #reader {
-      width: 100%; border-radius: 12px; overflow: hidden;
-      border: 1px solid #e0ddd8; background: #fff;
-      margin-bottom: 14px;
-    }
-
-    /* 結果ボックス */
-    .result-box {
-      border-radius: 10px; padding: 18px 16px; text-align: center;
-      margin-bottom: 14px; border: 1px solid #e0ddd8; background: #fff;
-      min-height: 80px; display: flex;
-      flex-direction: column; align-items: center; justify-content: center; gap: 6px;
-      transition: background 0.2s, border-color 0.2s;
-    }
-    .result-box.success { background: #e6f4ee; border-color: #a8dbbf; }
-    .result-box.warning { background: #fff8e6; border-color: #f5d87a; }
-    .result-box.danger  { background: #fff2f2; border-color: #f5c0c0; }
-    .result-main { font-size: 18px; font-weight: 500; }
-    .result-main.success { color: #0F6E56; }
-    .result-main.warning { color: #854F0B; }
-    .result-main.danger  { color: #A32D2D; }
-    .result-sub { font-size: 13px; color: #5a5855; }
-    .result-idle { font-size: 13px; color: #9e9b96; }
-
-    /* カウント */
-    .count-row { display: flex; gap: 8px; margin-bottom: 14px; }
-    .count-card {
-      flex: 1; background: #fff; border: 1px solid #e0ddd8;
-      border-radius: 8px; padding: 10px 12px; text-align: center;
-    }
-    .count-label { font-size: 11px; color: #9e9b96; margin-bottom: 4px; }
-    .count-val { font-size: 22px; font-weight: 500; color: #1a1a1a; }
-    .count-sub { font-size: 10px; color: #b0ada8; margin-top: 2px; }
-
-    /* エリア別内訳 */
-    .breakdown {
-      background: #fff; border: 1px solid #e0ddd8; border-radius: 8px;
-      padding: 10px 14px; margin-bottom: 14px;
-    }
-    .breakdown-title { font-size: 11px; color: #9e9b96; margin-bottom: 8px; }
-    .breakdown-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
-    .breakdown-area { font-size: 12px; color: #5a5855; }
-    .breakdown-count { font-size: 12px; font-weight: 500; color: #1a1a1a; }
-    .breakdown-bar-bg { flex: 1; height: 3px; background: #ede9e3; border-radius: 2px; margin: 0 10px; }
-    .breakdown-bar { height: 3px; border-radius: 2px; background: #1D9E75; transition: width 0.4s; }
-
-    /* 手動照合 */
-    .manual-section { margin-bottom: 0; }
-    .manual-tabs { display: flex; gap: 0; margin-bottom: 0; border-radius: 8px 8px 0 0; overflow: hidden; border: 1px solid #d8d6d0; border-bottom: none; }
-    .manual-tab {
-      flex: 1; padding: 8px 4px; font-size: 12px; font-weight: 500;
-      border: none; background: #f0ede8; color: #6b6965;
-      cursor: pointer; font-family: inherit; transition: all 0.15s; text-align: center;
-    }
-    .manual-tab.active { background: #fff; color: #1a1a1a; }
-    .manual-body {
-      border: 1px solid #d8d6d0; border-radius: 0 0 8px 8px;
-      padding: 10px; background: #fff; display: flex; gap: 8px;
-    }
-    .manual-input {
-      flex: 1; padding: 9px 12px; font-size: 13px;
-      border: 1px solid #d8d6d0; border-radius: 6px;
-      background: #f7f7f5; color: #1a1a1a; outline: none; font-family: inherit;
-    }
-    .manual-input:focus { border-color: #888; background: #fff; }
-    .manual-btn {
-      padding: 9px 16px; font-size: 13px; font-weight: 500;
-      border-radius: 6px; border: 1px solid #d8d6d0;
-      background: #1a1a1a; color: #fff; cursor: pointer;
-      font-family: inherit; white-space: nowrap;
-    }
-    .manual-btn:hover { opacity: 0.85; }
-
-    /* 入場ログ */
-    .log-section { margin-top: 16px; }
-    .log-header {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 8px;
-    }
-    .log-title { font-size: 12px; font-weight: 500; color: #6b6965; }
-    .log-clear {
-      font-size: 11px; color: #b0ada8; background: none; border: none;
-      cursor: pointer; padding: 0; font-family: inherit;
-    }
-    .log-clear:hover { color: #a32d2d; }
-    .log-list {
-      background: #fff; border: 1px solid #e0ddd8; border-radius: 8px;
-      overflow: hidden; max-height: 260px; overflow-y: auto;
-    }
-    .log-empty { padding: 16px; text-align: center; font-size: 12px; color: #b0ada8; }
-    .log-item {
-      display: flex; align-items: center; gap: 10px;
-      padding: 9px 12px; border-bottom: 1px solid #f0ede8; font-size: 12px;
-    }
-    .log-item:last-child { border-bottom: none; }
-    .log-item.success { border-left: 3px solid #a8dbbf; }
-    .log-item.warning { border-left: 3px solid #f5d87a; }
-    .log-item.danger  { border-left: 3px solid #f5c0c0; }
-    .log-time { color: #9e9b96; white-space: nowrap; font-size: 11px; min-width: 42px; }
-    .log-name { font-weight: 500; color: #1a1a1a; flex: 1; }
-    .log-area { color: #6b6965; white-space: nowrap; }
-    .log-badge {
-      font-size: 10px; padding: 2px 6px; border-radius: 4px; white-space: nowrap;
-    }
-    .log-badge.success { background: #e6f4ee; color: #0F6E56; }
-    .log-badge.warning { background: #fff8e6; color: #854F0B; }
-    .log-badge.danger  { background: #fff2f2; color: #A32D2D; }
-
-    .refresh-note { font-size: 10px; color: #b0ada8; text-align: right; margin-top: 4px; }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:"Helvetica Neue",Arial,"Hiragino Kaku Gothic ProN",sans-serif;background:#f7f7f5;color:#1a1a1a;min-height:100vh;padding:18px 14px 36px}
+    .wrap{max-width:760px;margin:0 auto}.header{margin-bottom:14px}.title{font-size:22px;font-weight:700}.sub{font-size:13px;color:#666;margin-top:4px;line-height:1.5}.notice{background:#fff8e6;border:1px solid #efd77d;border-radius:10px;padding:10px 12px;font-size:13px;color:#6b4a00;line-height:1.6;margin:12px 0}.panel{background:#fff;border:1px solid #e0ddd8;border-radius:14px;padding:14px;margin:12px 0}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.stat{background:#f7f7f5;border-radius:10px;padding:10px;text-align:center}.stat .num{font-size:22px;font-weight:700}.stat .label{font-size:12px;color:#666;margin-top:3px}.btn{width:100%;border:0;border-radius:10px;padding:13px 14px;font-size:15px;font-weight:700;cursor:pointer;background:#1a1a1a;color:#fff;margin-top:8px}.btn.secondary{background:#fff;color:#1a1a1a;border:1px solid #d8d6d0}.btn.danger{background:#8f2222}input{width:100%;border:1px solid #d8d6d0;border-radius:10px;padding:12px;font-size:16px;margin-top:8px}label{display:block;font-size:13px;color:#555;margin-top:12px}#reader{width:100%;max-width:520px;margin:0 auto;border-radius:12px;overflow:hidden;background:#111}.result{border-radius:14px;padding:18px;margin:12px 0;text-align:center;border:2px solid #ddd;background:#fff}.result-title{font-size:28px;font-weight:800;margin-bottom:8px}.result-main{font-size:20px;font-weight:700;line-height:1.7}.result-sub{font-size:13px;color:#555;line-height:1.7;margin-top:8px;white-space:pre-wrap}.ok{border-color:#1b8f5a;background:#eefaf4}.ok .result-title{color:#0f6e40}.warn{border-color:#c18416;background:#fff8e6}.warn .result-title{color:#854f0b}.ng{border-color:#bc3a3a;background:#fff2f2}.ng .result-title{color:#a32d2d}.muted{font-size:12px;color:#777;line-height:1.6;margin-top:8px}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:640px){.grid,.row{grid-template-columns:1fr}.title{font-size:19px}.result-title{font-size:24px}}
   </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="page-header">
-    <p class="page-title">梨花祭2026　入場確認</p>
-    <p class="page-sub">中夜祭・後夜祭</p>
+  <div class="header">
+    <div class="title">梨花祭2026 中夜祭 入場確認</div>
+    <div class="sub">外部ホスト版スキャナー。カメラはこのページで起動し、照合だけGASへ送信します。</div>
   </div>
 
-  <div class="gate-row">
-    <button class="gate-btn active" onclick="setGate(this, 'ゲート1')">ゲート 1</button>
-    <button class="gate-btn" onclick="setGate(this, 'ゲート2')">ゲート 2</button>
-    <button class="gate-btn" onclick="setGate(this, 'ゲート3')">ゲート 3</button>
-  </div>
+  <div class="notice" id="configNotice">GAS WebアプリURLを設定してください。</div>
 
-  <div id="reader"></div>
-
-  <div class="result-box" id="result-box">
-    <span class="result-idle">QRコードをかざしてください</span>
-  </div>
-
-  <div class="count-row">
-    <div class="count-card">
-      <p class="count-label">入場済（このゲート）</p>
-      <p class="count-val" id="cnt-gate">0</p>
-    </div>
-    <div class="count-card">
-      <p class="count-label">全体入場済</p>
-      <p class="count-val" id="cnt-total">—</p>
-      <p class="count-sub" id="cnt-updated"></p>
+  <div class="panel">
+    <div class="grid">
+      <div class="stat"><div class="num" id="enteredNum">-</div><div class="label">入場済</div></div>
+      <div class="stat"><div class="num" id="reservedNum">-</div><div class="label">予約数</div></div>
+      <div class="stat"><div class="num" id="capNum">-</div><div class="label">定員</div></div>
     </div>
   </div>
 
-  <!-- エリア別内訳 -->
-  <div class="breakdown">
-    <p class="breakdown-title">エリア別入場数</p>
-    <div id="breakdown-rows">
-      <div style="font-size:12px;color:#b0ada8;padding:4px 0">読み込み中...</div>
-    </div>
-  </div>
-  <p class="refresh-note" id="refresh-note">30秒ごとに自動更新</p>
-
-  <!-- 手動照合 -->
-  <div class="manual-section">
-    <div class="manual-tabs">
-      <button class="manual-tab active" onclick="switchTab('name', this)">氏名で照合</button>
-      <button class="manual-tab" onclick="switchTab('id', this)">予約IDで照合</button>
-    </div>
-    <div class="manual-body">
-      <input class="manual-input" type="text" id="manual-input-name" placeholder="例：千葉 英和">
-      <input class="manual-input" type="text" id="manual-input-id" placeholder="例：RSK-A3F9X2" style="display:none;text-transform:uppercase">
-      <button class="manual-btn" onclick="manualCheck()">照合</button>
-    </div>
+  <div id="result" class="result warn">
+    <div class="result-title">待機中</div>
+    <div class="result-main">スキャン開始を押してください</div>
+    <div class="result-sub" id="resultSub"></div>
   </div>
 
-  <!-- 入場ログ -->
-  <div class="log-section">
-    <div class="log-header">
-      <span class="log-title">入場ログ（このセッション）</span>
-      <button class="log-clear" onclick="clearLog()">クリア</button>
+  <div class="panel">
+    <div id="reader"></div>
+    <button class="btn" id="startBtn" onclick="startScanner()">スキャン開始</button>
+    <button class="btn danger" id="stopBtn" onclick="stopScanner()" style="display:none">スキャン停止</button>
+    <div class="muted">カメラが使えない場合は、下の「QR画像から読み取り」または予約ID手入力を使用。</div>
+  </div>
+
+  <div class="panel">
+    <div class="row">
+      <div>
+        <label>予約IDで受付</label>
+        <input id="manualId" placeholder="例：RSK-A3F9X2" autocomplete="off">
+        <button class="btn secondary" onclick="submitManualId()">予約IDで受付</button>
+      </div>
+      <div>
+        <label>氏名で受付</label>
+        <input id="manualName" placeholder="例：千葉 英和" autocomplete="off">
+        <button class="btn secondary" onclick="submitName()">氏名で検索</button>
+      </div>
     </div>
-    <div class="log-list" id="log-list">
-      <div class="log-empty" id="log-empty">まだ入場記録がありません</div>
-    </div>
+  </div>
+
+  <div class="panel">
+    <label>QR画像から読み取り</label>
+    <input type="file" id="qrFile" accept="image/*" capture="environment" onchange="scanFileQr(this.files && this.files[0])">
+    <div class="muted">Chromebook/スマホでQRを撮影して読み取れます。ライブカメラが塞がれた時の予備線です。</div>
   </div>
 </div>
 
-<audio id="entrySound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg" preload="auto"></audio>
-
 <script>
-  const GAS_URL = 'https://script.google.com/macros/s/AKfycbwdn5R9BnsO7uGnowp1ZN8uxL6V6gxza4zOIO9vCOM-cTJLCNrYurMTXI0QLd8Wbi8x/exec';
+// ここだけ自分のGAS WebアプリURLに置き換える。末尾は /exec のURL。
+const GAS_WEB_APP_URL = 'PASTE_YOUR_GAS_WEB_APP_EXEC_URL_HERE';
+const SCAN_API_TOKEN = 'scan_nUSvFTqmx_Lqft26p6S9muqscoXSyLrc';
+const DEVICE_NAME = 'scan-' + Math.random().toString(36).slice(2, 8);
 
-  const AREA_CAPS = { A: 120, B: 120, C: 150, D: 150, E: 120, F: 120, G: 150, H: 150 };
-  const TOTAL_CAP = Object.values(AREA_CAPS).reduce((a, b) => a + b, 0);
+let html5QrCode = null;
+let isScanning = false;
+let lastText = '';
+let lastAt = 0;
 
-  let gateLabel = 'ゲート1';
-  let gateCount = 0;
-  let lastScannedCode = '';
-  let scannerIsBusy = false;
-  let currentTab = 'name';
-  let logItems = [];
+function isConfigured() {
+  return /^https:\/\/script\.google\.com\/macros\/s\/.+\/exec/.test(GAS_WEB_APP_URL);
+}
 
-  // ─── GAS API呼び出し ───────────────────────────────────────
-  async function callGAS(action, params = {}) {
-    const res = await fetch(GAS_URL, {
-      method: 'POST',
-      body: JSON.stringify({ action, ...params }),
-      headers: { 'Content-Type': 'text/plain' }
-    });
-    return res.json();
+function updateConfigNotice() {
+  const el = document.getElementById('configNotice');
+  if (isConfigured()) {
+    el.textContent = '接続先GAS設定済み / 端末ID：' + DEVICE_NAME;
+    el.style.display = 'block';
+  } else {
+    el.textContent = '未設定：HTML内の GAS_WEB_APP_URL を、GAS Webアプリの /exec URL に置き換えてください。';
+    el.style.display = 'block';
   }
+}
+updateConfigNotice();
 
-  // ─── 全体入場数ポーリング（30秒ごと）──────────────────────
-  async function fetchTotalCount() {
-    try {
-      const res = await callGAS('getTotalEntryCount');
-      document.getElementById('cnt-total').textContent = res.total;
-      const now = new Date();
-      document.getElementById('cnt-updated').textContent =
-        now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0') + ' 更新';
-      renderBreakdown(res.byArea);
-    } catch(e) {
-      // 失敗しても無視
-    }
-  }
-
-  function renderBreakdown(byArea) {
-    const container = document.getElementById('breakdown-rows');
-    container.innerHTML = '';
-    Object.keys(AREA_CAPS).forEach(area => {
-      const count = byArea[area] || 0;
-      const cap = AREA_CAPS[area];
-      const pct = Math.min(Math.round(count / cap * 100), 100);
-      const row = document.createElement('div');
-      row.className = 'breakdown-row';
-      row.innerHTML =
-        '<span class="breakdown-area">' + area + ' エリア</span>' +
-        '<div class="breakdown-bar-bg"><div class="breakdown-bar" style="width:' + pct + '%"></div></div>' +
-        '<span class="breakdown-count">' + count + '<span style="color:#b0ada8;font-weight:400"> / ' + cap + '</span></span>';
-      container.appendChild(row);
-    });
-  }
-
-  fetchTotalCount();
-  setInterval(fetchTotalCount, 30000);
-
-  // ─── ゲート切り替え ────────────────────────────────────────
-  function setGate(el, label) {
-    document.querySelectorAll('.gate-btn').forEach(b => b.classList.remove('active'));
-    el.classList.add('active');
-    gateLabel = label;
-    gateCount = 0;
-    document.getElementById('cnt-gate').textContent = 0;
-    showIdle();
-  }
-
-  // ─── QRスキャナー ──────────────────────────────────────────
-  const html5QrcodeScanner = new Html5QrcodeScanner('reader', {
-    fps: 10,
-    qrbox: { width: 250, height: 250 }
-  });
-  html5QrcodeScanner.render(handleScan, () => {});
-
-  async function handleScan(qrText) {
-    if (scannerIsBusy || qrText === lastScannedCode) return;
-    scannerIsBusy = true;
-    lastScannedCode = qrText;
-    showChecking();
-
-    await html5QrcodeScanner.clear().catch(() => {});
-
-    try {
-      const res = await callGAS('checkEntryStatus', { reservationId: qrText });
-      showResult(res, 'QR');
-    } catch(e) {
-      showDanger('通信エラー', 'もう一度お試しください');
-    }
-
-    setTimeout(resetScanner, 3000);
-  }
-
-  function resetScanner() {
-    lastScannedCode = '';
-    scannerIsBusy = false;
-    showIdle();
-    html5QrcodeScanner.render(handleScan, () => {});
-  }
-
-  // ─── 手動照合タブ ──────────────────────────────────────────
-  function switchTab(tab, el) {
-    currentTab = tab;
-    document.querySelectorAll('.manual-tab').forEach(t => t.classList.remove('active'));
-    el.classList.add('active');
-    document.getElementById('manual-input-name').style.display = tab === 'name' ? '' : 'none';
-    document.getElementById('manual-input-id').style.display = tab === 'id' ? '' : 'none';
-  }
-
-  async function manualCheck() {
-    let value, action, params;
-
-    if (currentTab === 'name') {
-      value = document.getElementById('manual-input-name').value.trim();
-      if (!value) return;
-      action = 'checkEntryByName';
-      params = { name: value };
-    } else {
-      value = document.getElementById('manual-input-id').value.trim().toUpperCase();
-      if (!value) return;
-      action = 'checkEntryStatus';
-      params = { reservationId: value };
-    }
-
-    showChecking();
-    try {
-      const res = await callGAS(action, params);
-      showResult(res, '手動');
-      setTimeout(showIdle, 3000);
-      // 手動照合後は入力欄をクリア
-      document.getElementById('manual-input-name').value = '';
-      document.getElementById('manual-input-id').value = '';
-    } catch(e) {
-      showDanger('通信エラー', 'もう一度お試しください');
-    }
-  }
-
-  // Enterキーで照合
-  ['manual-input-name', 'manual-input-id'].forEach(id => {
-    document.getElementById(id).addEventListener('keydown', e => {
-      if (e.key === 'Enter') manualCheck();
-    });
-  });
-
-  // ─── 結果表示 ──────────────────────────────────────────────
-  function showResult(res, method) {
-    const time = new Date();
-    if (res.status === 'entry_success') {
-      gateCount++;
-      document.getElementById('cnt-gate').textContent = gateCount;
-      document.getElementById('entrySound').play().catch(() => {});
-      showSuccess('入場を許可しました', res.name + '　— ' + res.area + ' エリア');
-      addLog('success', time, res.name, res.area, '入場', method);
-      // 入場成功時はすぐに全体数を更新
-      setTimeout(fetchTotalCount, 1000);
-    } else if (res.status === 'already_entered') {
-      showWarning('入場済みです', res.name + '　— ' + res.area + ' エリア');
-      addLog('warning', time, res.name, res.area, '入場済', method);
-    } else if (res.status === 'not_found') {
-      showDanger('データ未登録', 'QRコードまたは入力内容を確認してください');
-      addLog('danger', time, '—', '—', '未登録', method);
-    } else if (res.status === 'invalid_format') {
-      showDanger('QR読み取りエラー', '対応していないQRコードです');
-    } else if (res.status === 'lock_error') {
-      showDanger('サーバー混雑', 'もう一度スキャンしてください');
-    } else {
-      showDanger('エラー', res.status);
-    }
-  }
-
-  // ─── 入場ログ ──────────────────────────────────────────────
-  function addLog(type, time, name, area, label, method) {
-    const timeStr = String(time.getHours()).padStart(2, '0') + ':' + String(time.getMinutes()).padStart(2, '0');
-    logItems.unshift({ type, timeStr, name, area, label, method });
-    renderLog();
-  }
-
-  function renderLog() {
-    const list = document.getElementById('log-list');
-    const empty = document.getElementById('log-empty');
-    if (logItems.length === 0) {
-      empty.style.display = '';
-      // ヘッダー以外削除
-      while (list.children.length > 1) list.removeChild(list.lastChild);
+function jsonp(action, params) {
+  return new Promise(function(resolve, reject) {
+    if (!isConfigured()) {
+      reject(new Error('GAS_WEB_APP_URL is not configured'));
       return;
     }
-    empty.style.display = 'none';
-    // 既存ログ行削除
-    while (list.children.length > 1) list.removeChild(list.lastChild);
-    logItems.forEach(item => {
-      const el = document.createElement('div');
-      el.className = 'log-item ' + item.type;
-      el.innerHTML =
-        '<span class="log-time">' + item.timeStr + '</span>' +
-        '<span class="log-name">' + item.name + '</span>' +
-        '<span class="log-area">' + (item.area !== '—' ? item.area + 'エリア' : '—') + '</span>' +
-        '<span class="log-badge ' + item.type + '">' + item.label + '</span>';
-      list.appendChild(el);
-    });
-  }
+    const callbackName = '__scanCb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+    const query = new URLSearchParams(Object.assign({}, params || {}, {
+      api: 'scan',
+      token: SCAN_API_TOKEN,
+      action,
+      deviceName: DEVICE_NAME,
+      callback: callbackName,
+      _: Date.now()
+    }));
+    const script = document.createElement('script');
+    const timer = setTimeout(function() {
+      cleanup();
+      reject(new Error('GAS API timeout'));
+    }, 12000);
+    function cleanup() {
+      clearTimeout(timer);
+      delete window[callbackName];
+      if (script.parentNode) script.parentNode.removeChild(script);
+    }
+    window[callbackName] = function(data) {
+      cleanup();
+      resolve(data || {});
+    };
+    script.onerror = function() {
+      cleanup();
+      reject(new Error('GAS API load error'));
+    };
+    script.src = GAS_WEB_APP_URL + '?' + query.toString();
+    document.body.appendChild(script);
+  });
+}
 
-  function clearLog() {
-    logItems = [];
-    renderLog();
+async function startScanner() {
+  if (!isConfigured()) {
+    setResult('ng', '設定未完了', 'GAS WebアプリURLが未設定です。HTML内の GAS_WEB_APP_URL を置き換えてください。');
+    return;
   }
+  if (isScanning) return;
+  setResult('warn', '起動中', 'カメラを起動しています。');
+  html5QrCode = new Html5Qrcode('reader');
+  const config = { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 };
+  try {
+    await html5QrCode.start({ facingMode: 'environment' }, config, onScanSuccess, function() {});
+  } catch (e1) {
+    try {
+      const cameras = await Html5Qrcode.getCameras();
+      if (!cameras || cameras.length === 0) throw new Error('カメラが見つかりません');
+      const back = cameras.find(c => /back|rear|environment|背面|後面/i.test(c.label));
+      await html5QrCode.start((back || cameras[0]).id, config, onScanSuccess, function() {});
+    } catch (e2) {
+      setResult('ng', 'カメラ取得失敗', String((e2 && (e2.message || e2)) || e1));
+      return;
+    }
+  }
+  isScanning = true;
+  document.getElementById('startBtn').style.display = 'none';
+  document.getElementById('stopBtn').style.display = 'block';
+  setResult('warn', 'スキャン待機中', 'QRコードをカメラに向けてください。');
+}
 
-  // ─── UI ヘルパー ───────────────────────────────────────────
-  function showIdle() {
-    const b = document.getElementById('result-box');
-    b.className = 'result-box';
-    b.innerHTML = '<span class="result-idle">QRコードをかざしてください</span>';
+async function stopScanner() {
+  if (!html5QrCode || !isScanning) return;
+  try { await html5QrCode.stop(); } catch(e) {}
+  isScanning = false;
+  document.getElementById('startBtn').style.display = 'block';
+  document.getElementById('stopBtn').style.display = 'none';
+  setResult('warn', '停止中', 'スキャンを停止しました。');
+}
+
+function onScanSuccess(decodedText) {
+  const text = String(decodedText || '').trim().toUpperCase();
+  const now = Date.now();
+  if (!text || (text === lastText && now - lastAt < 2500)) return;
+  lastText = text;
+  lastAt = now;
+  checkReservationId(text);
+}
+
+async function checkReservationId(id) {
+  setResult('warn', '照合中', id);
+  try {
+    const res = await jsonp('checkEntryStatus', { reservationId: id });
+    renderApiResult(res);
+    refreshSummary();
+  } catch (e) {
+    setResult('ng', '通信失敗', String(e && (e.message || e)));
   }
-  function showChecking() {
-    const b = document.getElementById('result-box');
-    b.className = 'result-box';
-    b.innerHTML = '<span class="result-idle">確認中...</span>';
+}
+
+async function submitManualId() {
+  const id = document.getElementById('manualId').value.trim().toUpperCase();
+  if (!id) return setResult('ng', '入力不足', '予約IDを入力してください。');
+  await checkReservationId(id);
+}
+
+async function submitName() {
+  const name = document.getElementById('manualName').value.trim();
+  if (!name) return setResult('ng', '入力不足', '氏名を入力してください。');
+  setResult('warn', '氏名検索中', name);
+  try {
+    const res = await jsonp('checkEntryByName', { name });
+    renderApiResult(res);
+    refreshSummary();
+  } catch (e) {
+    setResult('ng', '通信失敗', String(e && (e.message || e)));
   }
-  function showSuccess(main, sub) { setResultBox('success', '✓', main, sub); }
-  function showWarning(main, sub) { setResultBox('warning', '!', main, sub); }
-  function showDanger(main, sub)  { setResultBox('danger',  '×', main, sub); }
-  function setResultBox(type, icon, main, sub) {
-    const b = document.getElementById('result-box');
-    b.className = 'result-box ' + type;
-    b.innerHTML =
-      '<div style="font-size:28px;line-height:1">' + icon + '</div>' +
-      '<div class="result-main ' + type + '">' + main + '</div>' +
-      '<div class="result-sub">' + sub + '</div>';
+}
+
+async function scanFileQr(file) {
+  if (!file) return;
+  const scanner = new Html5Qrcode('reader');
+  try {
+    const text = await scanner.scanFile(file, true);
+    onScanSuccess(text);
+  } catch (e) {
+    setResult('ng', '画像読取失敗', String(e && (e.message || e)));
   }
+}
+
+function renderApiResult(res) {
+  if (!res || !res.status) return setResult('ng', '不明な応答', JSON.stringify(res));
+  if (res.status === 'entry_success') {
+    return setResult('ok', '入場OK', (res.name || '') + ' / ' + (res.area || '-') + 'エリア', '予約ID：' + (res.reservationId || '') + '\n受付時刻：' + (res.enteredAt || ''));
+  }
+  if (res.status === 'already_entered') {
+    return setResult('warn', '入場済み', (res.name || '') + ' / ' + (res.area || '-') + 'エリア', 'すでに受付済みです。\n受付時刻：' + (res.enteredAt || '不明'));
+  }
+  if (res.status === 'not_found') return setResult('ng', '該当なし', '予約IDまたは氏名が見つかりません。');
+  if (res.status === 'invalid_ticket') return setResult('ng', '無効チケット', (res.name || '') + ' / ' + (res.area || '-') + 'エリア', '状態：' + (res.reservationStatus || '無効'));
+  if (res.status === 'multiple_matches') return setResult('warn', '同姓同名あり', '予約IDで受付してください。', JSON.stringify(res.matches || [], null, 2));
+  if (res.status === 'unauthorized') return setResult('ng', '権限なし', 'スキャンAPIトークンが違います。');
+  if (res.status === 'lock_error') return setResult('warn', '混雑中', '数秒後にもう一度試してください。');
+  if (res.status === 'invalid_format') return setResult('ng', '形式エラー', '予約IDまたは氏名の形式が不正です。');
+  setResult('ng', 'エラー', res.status, JSON.stringify(res));
+}
+
+function setResult(kind, title, main, sub) {
+  const el = document.getElementById('result');
+  el.className = 'result ' + kind;
+  el.querySelector('.result-title').textContent = title || '';
+  el.querySelector('.result-main').textContent = main || '';
+  document.getElementById('resultSub').textContent = sub || '';
+}
+
+async function refreshSummary() {
+  if (!isConfigured()) return;
+  try {
+    const res = await jsonp('adminGetSummary', {});
+    if (res && res.status === 'ok') {
+      document.getElementById('enteredNum').textContent = res.totalEntered;
+      document.getElementById('reservedNum').textContent = res.totalReserved;
+      document.getElementById('capNum').textContent = res.totalCap;
+    }
+  } catch(e) {}
+}
+refreshSummary();
+setInterval(refreshSummary, 15000);
 </script>
 </body>
 </html>
